@@ -1,0 +1,251 @@
+﻿<html>
+	<head>
+		<script type="text/javascript">
+
+//Global Variables
+		var PLAYER = "O";
+		var CPU = "X";
+		var BLANK = "_";
+		var ONEPLAYER = true;
+
+		var currentTurn = PLAYER;
+		var currentGame;
+		var blankCount = 9;
+		var oCells;
+
+		var cpuGameBoard;
+		var cpuCurrentTurn;
+
+		initCurrentGame();
+		initCPUGameBoard();
+		clearBoard();
+
+		function playerSelect(sender,row,col){
+			if(currentGame[row][col] != BLANK){
+				alert("Invalid move!");
+				return;
+			}
+
+//Player X Move
+			sender.innerHTML = currentTurn;
+			currentGame[row][col] = currentTurn;
+			blankCount--;
+
+//switch player
+			switchTurn();
+			if(ONEPLAYER == true){
+				cpuTurn();
+				winner = determine(currentGame);
+				if(winner != "notend"){
+					if(winner == "draw"){
+						alert("Draw!");
+					}else{
+						alert("Winner is " + winner + " !!!");
+					}
+					resetGame();
+					return;
+				}
+			}
+		}
+
+		function switchTurn(){
+			if(currentTurn == PLAYER){
+				currentTurn = CPU;
+			}else{
+				currentTurn = PLAYER;
+			}
+		}
+
+		function determine(gameBoard){
+			for(var i = 0 ; i < gameBoard.length ; i++){
+				if(gameBoard[i][0] == gameBoard[i][1] &&
+					gameBoard[i][1] == gameBoard[i][2])
+				{
+					if(gameBoard[i][0] != BLANK){
+						return gameBoard[i][0];
+					}
+				}
+			}
+
+			for(var j = 0 ; j < gameBoard[0].length ; j++){
+				if(gameBoard[0][j] == gameBoard[1][j] &&
+					gameBoard[1][j] == gameBoard[2][j])
+				{
+					if(gameBoard[0][j] != BLANK){
+						return gameBoard[0][j];
+					}
+				}
+			}
+
+			if((gameBoard[0][0] == gameBoard[1][1] &&
+				gameBoard[1][1] == gameBoard[2][2]) ||
+				(gameBoard[0][2] == gameBoard[1][1] &&
+				gameBoard[1][1] == gameBoard[2][0]))
+			{
+				if(gameBoard[1][1] != BLANK){
+					return gameBoard[1][1];
+				}
+			}
+
+			if(blankCount == 0){
+				return "draw";
+			}
+			return "notend";
+		}
+
+		function initCurrentGame(){
+			currentGame = new Array(3);
+			for(var i = 0 ; i < currentGame.length ; i++)
+			{
+				currentGame[i] = new Array(3);
+				for(var j = 0 ; j < currentGame[i].length ; j++)
+				{
+						currentGame[i][j] = BLANK;
+				}
+			}
+		}
+
+		function setMove(row,col,turn){
+			var pos = row*3 + col;
+			oCells[pos].innerHTML = turn;
+		}
+
+		function clearBoard(){
+			oCells = document.getElementsByName("board");
+			for(var i = 0 ; i < oCells.length ; i++){
+				oCells.item(i).innerHTML = "";
+			}
+		}
+
+		function resetGame(){
+			blankCount = 9;
+			clearBoard();
+			currentTurn = PLAYER;
+
+			for(var i = 0 ; i < currentGame.length ; i++){
+				for(var j = 0 ; j < currentGame[i].length ; j++){
+					currentGame[i][j] = BLANK;
+				}
+			}
+		}
+
+		function switchCPUTurn(){
+			if(cpuCurrentTurn == CPU)
+				cpuCurrentTurn = PLAYER;
+			else
+				cpuCurrentTurn = CPU;
+		}
+
+		function initCPUGameBoard(){
+			cpuGameBoard = new Array(3);
+			for(var i = 0 ; i < cpuGameBoard.length ; i++){
+				cpuGameBoard[i] = new Array(3);
+			}
+		}
+
+		function copyGameBoard(){
+			for(var i = 0 ; i < cpuGameBoard.length ; i++){
+				for(var j = 0 ; j < cpuGameBoard[i].length; j++){
+					cpuGameBoard[i][j] = currentGame[i][j];
+				}
+			}
+		}
+
+		function cpuTurn(){
+			if(currentTurn != CPU) return;
+			if(blankCount == 0) return;
+			copyGameBoard();
+			cpuCurrentTurn = CPU;
+			var res,ci,cj,choose = -1000;
+			document.getElementById("ai").innerHTML="";
+			for(var i = 0 ; i < cpuGameBoard.length ; i++){
+				for(var j = 0 ; j < cpuGameBoard[i].length ; j++){
+					if(cpuGameBoard[i][j] == BLANK){
+						cpuGameBoard[i][j] = cpuCurrentTurn;
+						blankCount--;
+						switchCPUTurn();
+						res = search(1);
+						document.getElementById("ai").innerHTML+="app " + i + "," + j + " " + res + "<br>";
+						cpuGameBoard[i][j] = BLANK;
+						blankCount++;
+						if(choose == -1000){
+							choose = res;
+							ci = i;
+							cj = j;
+						}else if(res > choose){
+							choose = res;
+							ci = i;
+							cj = j;
+						}
+						switchCPUTurn();
+					}
+				}
+			}
+							document.getElementById("ai").innerHTML+="choose=" + choose + " ci=" + ci + " cj=" + cj;
+			currentGame[ci][cj] = CPU;
+			blankCount--;
+			setMove(ci,cj,CPU);
+			switchTurn();
+		}
+
+		function search(level){
+			var res = determine(cpuGameBoard);
+			if(res == CPU){
+				return  100-level;
+			}else if(res == PLAYER){
+				return level-100;
+			}else if(res == "draw"){
+				return 0;
+			}
+
+			var choose = -1000;
+			var temp;
+
+			for(var i = 0 ; i < cpuGameBoard.length ; i++){
+				for(var j = 0 ; j < cpuGameBoard[i].length ; j++){
+					if(cpuGameBoard[i][j] == BLANK){
+						cpuGameBoard[i][j] = cpuCurrentTurn;
+						switchCPUTurn();
+						blankCount--;
+						temp = search(level + 1);
+						switchCPUTurn();
+						cpuGameBoard[i][j] = BLANK;
+						blankCount++;
+						if(choose == -1000){
+							choose = temp;
+						}else if(cpuCurrentTurn == CPU){
+							if(temp > choose) choose = temp;
+						}else if(cpuCurrentTurn == PLAYER){
+							if(temp < choose) choose = temp;
+						}
+					}
+				}
+			}
+			return choose;
+		}
+		</script>
+	</head>
+	<body>
+		<h1>Unbeatable Tic - Tac - Toe!</h1>
+		<table bgcolor="#000000" cellpadding="5" cellspacing="1" >
+			<tr height="50">
+				<td name="board" id="board" onclick="playerSelect(this,0,0);" align="center" bgcolor="#ffffff" valign="middle" width="50"></td>
+				<td name="board" id="board" onclick="playerSelect(this,0,1);" align="center" bgcolor="#ffffff" valign="middle" width="50"></td>
+				<td name="board" id="board" onclick="playerSelect(this,0,2);" align="center" bgcolor="#ffffff" valign="middle" width="50"></td>
+			</tr>
+			<tr height="50">
+				<td name="board" id="board" onclick="playerSelect(this,1,0);" align="center" bgcolor="#ffffff" valign="middle"></td>
+				<td name="board" id="board" onclick="playerSelect(this,1,1);" align="center" bgcolor="#ffffff" valign="middle"></td>
+				<td name="board" id="board" onclick="playerSelect(this,1,2);" align="center" bgcolor="#ffffff" valign="middle"></td>
+			</tr>
+			<tr height="50">
+				<td name="board" id="board" onclick="playerSelect(this,2,0);" align="center" bgcolor="#ffffff" valign="middle"></td>
+				<td name="board" id="board" onclick="playerSelect(this,2,1);" align="center" bgcolor="#ffffff" valign="middle"></td>
+				<td name="board" id="board" onclick="playerSelect(this,2,2);" align="center" bgcolor="#ffffff" valign="middle"></td>
+			</tr>
+			<tr>
+				<td colspan="3" id="ai" style="font-family: Tahoma; font-size: 10pt;" bgcolor="#fbfbfb" hidden="true"></td>
+			</tr>
+		</table>
+	</body>
+</html>
