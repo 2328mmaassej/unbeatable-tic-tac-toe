@@ -1,0 +1,36 @@
+<html>
+
+<head>
+    <title>Unbeatable Tic Tac Toe</title>
+
+    <script type="text/javascript" src="js/board.js" ></script>
+    <script type="text/javascript" src="js/game.js" ></script>
+    <script type="text/javascript" src="js/computer.js" ></script>
+    <script type="text/javascript" src="js/human.js" ></script>
+
+</head>
+
+<body>
+  <h1>Unbeatable Tic - Tac - Toe!</h1>
+    <table bgcolor="#000000" cellpadding="5" cellspacing="1" >
+      <tr height="50">
+        <td name="board" id="board" onclick="doHumanTurn(this,0,0);" align="center" bgcolor="#ffffff" valign="middle" width="50"></td>
+        <td name="board" id="board" onclick="doHumanTurn(this,0,1);" align="center" bgcolor="#ffffff" valign="middle" width="50"></td>
+        <td name="board" id="board" onclick="doHumanTurn(this,0,2);" align="center" bgcolor="#ffffff" valign="middle" width="50"></td>
+      </tr>
+      <tr height="50">
+        <td name="board" id="board" onclick="doHumanTurn(this,1,0);" align="center" bgcolor="#ffffff" valign="middle"></td>
+        <td name="board" id="board" onclick="doHumanTurn(this,1,1);" align="center" bgcolor="#ffffff" valign="middle"></td>
+        <td name="board" id="board" onclick="doHumanTurn(this,1,2);" align="center" bgcolor="#ffffff" valign="middle"></td>
+      </tr>
+      <tr height="50">
+        <td name="board" id="board" onclick="doHumanTurn(this,2,0);" align="center" bgcolor="#ffffff" valign="middle"></td>
+        <td name="board" id="board" onclick="doHumanTurn(this,2,1);" align="center" bgcolor="#ffffff" valign="middle"></td>
+        <td name="board" id="board" onclick="doHumanTurn(this,2,2);" align="center" bgcolor="#ffffff" valign="middle"></td>
+      </tr>
+      <tr>
+        <td colspan="3" id="ai" style="font-family: Tahoma; font-size: 10pt;" bgcolor="#fbfbfb" hidden="true"></td>
+      </tr>
+    </table>
+</body>
+</html>
