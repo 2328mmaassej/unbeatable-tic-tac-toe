@@ -15,52 +15,49 @@ initCurrentGame();
 initCPUGameBoard();
 clearBoard();
 
-function checkWinner(gameBoard){
-  for(var i = 0 ; i < gameBoard.length ; i++){
-    if(gameBoard[i][0] == gameBoard[i][1] &&
-      gameBoard[i][1] == gameBoard[i][2])
-    {
-      if(gameBoard[i][0] != BLANK){
-        return gameBoard[i][0];
-      }
-    }
+function doHumanTurn(sender,row,col) {
+  if(currentGame[row][col] != BLANK) {
+    alert("Invalid move!");
+    return;
   }
+  sender.innerHTML = currentTurn;
+  currentGame[row][col] = currentTurn;
+  blankCount--;
 
-  for(var j = 0 ; j < gameBoard[0].length ; j++){
-    if(gameBoard[0][j] == gameBoard[1][j] &&
-      gameBoard[1][j] == gameBoard[2][j])
-    {
-      if(gameBoard[0][j] != BLANK){
-        return gameBoard[0][j];
-      }
-    }
-  }
+  checkWinner();
 
-  if((gameBoard[0][0] == gameBoard[1][1] &&
-    gameBoard[1][1] == gameBoard[2][2]) ||
-    (gameBoard[0][2] == gameBoard[1][1] &&
-    gameBoard[1][1] == gameBoard[2][0]))
-  {
-    if(gameBoard[1][1] != BLANK){
-      return gameBoard[1][1];
-    }
-  }
-
-  if(blankCount == 0){
-    return "draw";
-  }
-  return "notend";
+  switchTurn();
 }
 
-function switchTurn(){
+function doComputerTurn() {
+  minimax();
+
+  checkWinner();
+}
+
+function checkWinner() {
+  var winner = determineWinner(currentGame);
+  if(winner != "notend"){
+    if(winner == "draw"){
+      alert("Draw!");
+    }else{
+      alert("Winner is " + winner + " !!!");
+    }
+    resetGame();
+    return;
+  }
+}
+
+function switchTurn() {
   if(currentTurn == PLAYER){
     currentTurn = CPU;
+    doComputerTurn();
   }else{
     currentTurn = PLAYER;
   }
 }
 
-function switchCPUTurn(){
+function switchCPUTurn() {
   if(cpuCurrentTurn == CPU)
     cpuCurrentTurn = PLAYER;
   else
