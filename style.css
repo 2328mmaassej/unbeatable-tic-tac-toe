@@ -1,0 +1,5 @@
+table { background:#000000; border-padding:5px; border-spacing:1px; }
+
+tr { height:50px; }
+
+.board { text-align:center; background:#ffffff; vertical-align:middle; width:50px; }
